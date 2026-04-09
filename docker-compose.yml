@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  api:
+    build: ./app
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGO_URI=mongodb://db:27017/tareas
+    depends_on:
+      - db
+
+  db:
+    image: mongo:6.0
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:

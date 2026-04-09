@@ -1,0 +1,13 @@
+{
+  "name": "docker-crud-app",
+  "version": "1.0.0",
+  "description": "App multicontenedor para práctica",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.0.0"
+  }
+}

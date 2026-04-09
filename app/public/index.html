@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Tareas</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; padding: 20px; display: flex; justify-content: center; }
+        .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 100%; max-width: 450px; }
+        h1 { font-size: 24px; text-align: center; color: #333; }
+        .input-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        input[type="text"] { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        button { padding: 8px 12px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #218838; }
+        ul { list-style-type: none; padding: 0; }
+        li { background: #fdfdfd; margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
+        .task-text { flex: 1; margin-right: 10px; }
+        .btn-group { display: flex; gap: 5px; }
+        .edit-btn { background: #007bff; font-size: 12px; }
+        .edit-btn:hover { background: #0056b3; }
+        .delete-btn { background: #dc3545; font-size: 12px; }
+        .delete-btn:hover { background: #c82333; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Mis Tareas (CRUD)</h1>
+    
+    <div class="input-group">
+        <input type="text" id="taskInput" placeholder="Añadir nueva tarea...">
+        <button onclick="addTask()">Añadir</button>
+    </div>
+
+    <ul id="taskList"></ul>
+</div>
+
+<script>
+    const API_URL = '/tareas';
+
+    // Función para cargar (READ) las tareas
+    async function loadTasks() {
+        const response = await fetch(API_URL);
+        const tasks = await response.json();
+        const list = document.getElementById('taskList');
+        list.innerHTML = '';
+        
+        tasks.forEach(task => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <span class="task-text">${task.titulo}</span>
+                <div class="btn-group">
+                    <button class="edit-btn" onclick="editTask('${task._id}', '${task.titulo.replace(/'/g, "\\'")}')">Editar</button>
+                    <button class="delete-btn" onclick="deleteTask('${task._id}')">Borrar</button>
+                </div>
+            `;
+            list.appendChild(li);
+        });
+    }
+
+    // Función para añadir (CREATE)
+    async function addTask() {
+        const input = document.getElementById('taskInput');
+        const title = input.value.trim();
+        if (!title) return;
+
+        await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ titulo: title })
+        });
+
+        input.value = '';
+        loadTasks();
+    }
+
+    // Función para editar (UPDATE)
+    async function editTask(id, currentTitle) {
+        const newTitle = prompt("Edita el nombre de la tarea:", currentTitle);
+        
+        // Solo actualizamos si el usuario escribió algo distinto y no canceló
+        if (newTitle !== null && newTitle.trim() !== "" && newTitle !== currentTitle) {
+            await fetch(`${API_URL}/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ titulo: newTitle.trim() })
+            });
+            loadTasks();
+        }
+    }
+
+    // Función para borrar (DELETE)
+    async function deleteTask(id) {
+        if(confirm("¿Seguro que quieres borrar esta tarea?")) {
+            await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+            loadTasks();
+        }
+    }
+
+    // Cargar las tareas al iniciar
+    loadTasks();
+</script>
+
+</body>
+</html>
