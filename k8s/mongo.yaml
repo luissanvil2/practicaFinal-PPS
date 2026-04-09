@@ -15,6 +15,9 @@ spec:
       containers:
       - name: mongo
         image: mongo:6.0
+        # [CORRECCIÓN KICS - HIGH] Vulnerabilidad introducida (por omisión): Prevención de escalada de privilegios.
+        securityContext:
+          allowPrivilegeEscalation: false
         ports:
         - containerPort: 27017
         volumeMounts:

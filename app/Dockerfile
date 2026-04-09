@@ -2,13 +2,17 @@ FROM node:18-alpine
 
 WORKDIR /usr/src/app
 
-# Copiamos primero el package.json para aprovechar la caché de Docker
-COPY package*.json ./
-RUN npm install
+FROM node:18-alpine
 
-# Copiamos el resto del código
-COPY . .
+# [CORRECCIÓN KICS - HIGH] Vulnerabilidad existente: El contenedor corre como root por defecto.
+# Se añade USER node para ejecutar el proceso con un usuario sin privilegios.
+USER node
+
+WORKDIR /usr/src/app
+
+COPY --chown=node:node package*.json ./
+RUN npm install
+COPY --chown=node:node . .
 
 EXPOSE 3000
-
 CMD ["npm", "start"]

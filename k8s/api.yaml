@@ -1,20 +1,12 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: api
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: api
-  template:
-    metadata:
-      labels:
-        app: api
-    spec:
-      containers:
+containers:
       - name: api
         image: mi-api-tareas:1.0
+        # [CORRECCIÓN KICS - HIGH] Vulnerabilidad introducida (por omisión): Se permitía la escalada de privilegios.
+        # Solución: Se añade securityContext para prohibirlo y forzar el uso de usuario no-root.
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1000
         imagePullPolicy: Never
         ports:
         - containerPort: 3000
