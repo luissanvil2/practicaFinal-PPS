@@ -1,4 +1,18 @@
-containers:
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
       - name: api
         image: mi-api-tareas:1.0
         # [CORRECCIÓN KICS - HIGH] Vulnerabilidad introducida (por omisión): Se permitía la escalada de privilegios.
